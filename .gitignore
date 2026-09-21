@@ -1,0 +1,35 @@
+# Local .terraform directories
+.terraform/
+
+# .tfstate files (contain sensitive data & should not be committed)
+*.tfstate
+*.tfstate.*
+terraform.tfstate.d/
+
+# Crash log files
+crash.log
+crash.*.log
+
+# Override files (auto-generated, local only)
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Terraform plan files
+*.tfplan
+*.plan
+
+# macOS system files
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# IDE / Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Misc
+.kombai/

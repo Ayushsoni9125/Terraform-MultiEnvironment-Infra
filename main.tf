@@ -1,0 +1,64 @@
+terraform {
+  required_providers {
+    aws = {
+      source = "hashicorp/aws"
+    }
+  }
+}
+
+provider "aws" {
+  region = var.aws_region
+}
+
+data "aws_vpc" "default" {
+  default = true
+}
+
+data "aws_subnets" "default" {
+  filter {
+    name   = "vpc-id"
+    values = [data.aws_vpc.default.id]
+  }
+}
+
+data "aws_availability_zones" "available" {
+  state = "available"
+}
+
+data "aws_ami" "amazon_linux" {
+  most_recent = true
+
+  owners = ["amazon"]
+
+  filter {
+    name   = "name"
+    values = [var.ami_name_pattern]
+  }
+
+  filter {
+    name   = "state"
+    values = ["available"]
+  }
+}
+
+resource "aws_instance" "app" {
+  count = var.instance_count
+
+  ami           = data.aws_ami.amazon_linux.id
+  instance_type = var.instance_type
+
+  subnet_id = data.aws_subnets.default.ids[
+    count.index % length(data.aws_subnets.default.ids)
+  ]
+
+  tags = {
+    Name        = "${var.project_name}-${var.environment}-${count.index + 1}"
+    Environment = var.environment
+    Project     = var.project_name
+  }
+}
+
+output "instance_ids" {
+  description = "IDs of the EC2 instances"
+  value       = aws_instance.app[*].id
+}
